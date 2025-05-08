@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1-bit Jaws</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for better visual appeal if needed */
+        body {
+            font-family: 'Inter Tight', sans-serif; /* Using Inter font as preferred */
+        }
+        /* Ensure the html and body take full height for centering */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body a{
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <header class="mb-8 text-center">
+        <img src="logo-black.png" class="size-24 inline-block mb-6" alt="">
+        <p class="text-white opacity-40">1-bit frame of Jaws, every 15 minutes, until July 4th</p>
+    </header>
+
+    <main class="flex justify-center items-center w-full max-w-2xl">
+        <div class="">
+            <img id="sequenceImage" src="public/current.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md">
+            <script>
+                const img = document.getElementById('sequenceImage');
+                img.onerror = function() {
+                    // Fallback if the image fails to load
+                    img.alt = "Image currently unavailable. Please check back soon.";
+                    // Adjust placeholder path if needed, or use an absolute URL
+                    img.src = "https://superfunteam.github.io/jaws/public/current.png";
+                };
+            </script>
+        </div>
+    </main>
+
+    <footer class="mt-12 text-center text-white opacity-40 text-sm">
+        <p>Made with ❤ by  <a href="https://twitter.com/clarklab">@clarklab</a> from <a href="https://superfun.games">Superfun Games</a>. Make your own! <a href="https://github.com/superfunteam/jaws">Source on Github here.</a></p>
+        
+    </footer>
+
+</body>
+</html>
