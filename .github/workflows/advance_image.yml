@@ -30,6 +30,9 @@ jobs:
             exit 1
           fi
 
+          echo "Ensuring _data directory exists..."
+          mkdir -p _data # <--- ADDED THIS LINE
+
           echo "Generating image list..."
           # List files matching the pattern in the 'frames' directory
           ls frames/seq-*.png | sort > _data/image_list.txt
@@ -89,7 +92,8 @@ jobs:
       - name: Commit changes
         run: |
           # Add image_list.txt as it's regenerated each time for accuracy
-          git add public/current.png _data/image_counter.txt _data/image_list.txt
+          # also _data directory itself might be new if this is the first run where it's created
+          git add public/current.png _data/image_counter.txt _data/image_list.txt _data
           
           if git diff --staged --quiet; then
             echo "No effective change to image or counter. Skipping commit."
