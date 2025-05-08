@@ -35,11 +35,15 @@
             <img id="sequenceImage" src="public/current.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md">
             <script>
                 const img = document.getElementById('sequenceImage');
+                // Add cache-busting timestamp to the image URL
+                const timestamp = new Date().getTime();
+                img.src = `public/current.png?t=${timestamp}`;
+                
                 img.onerror = function() {
                     // Fallback if the image fails to load
                     img.alt = "Image currently unavailable. Please check back soon.";
                     // Adjust placeholder path if needed, or use an absolute URL
-                    img.src = "https://superfunteam.github.io/jaws/public/current.png";
+                    img.src = `https://superfunteam.github.io/jaws/public/current.png?t=${timestamp}`;
                 };
             </script>
         </div>
