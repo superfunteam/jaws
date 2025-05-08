@@ -1,0 +1,99 @@
+name: Advance Image Sequence (Scheduled)
+
+on:
+  workflow_dispatch: # Allows manual trigger via API or GitHub UI as well
+  schedule:
+    # Runs every 15 minutes
+    - cron: '*/15 * * * *'
+
+jobs:
+  advance_and_update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to commit changes back to the repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Git User
+        run: |
+          git config --global user.name "Image Sequencer Bot"
+          git config --global user.email "actions@github.com" # Or your preferred bot email
+
+      - name: Read image list and counter
+        id: read_state
+        run: |
+          # Ensure the frames directory exists and contains matching files
+          if [ ! -d "frames" ] || [ -z "$(ls -A frames/seq-*.png 2>/dev/null)" ]; then
+            echo "::error::'frames' directory is missing, empty, or contains no files matching 'seq-*.png'."
+            exit 1
+          fi
+
+          echo "Generating image list..."
+          # List files matching the pattern in the 'frames' directory
+          ls frames/seq-*.png | sort > _data/image_list.txt
+          
+          TOTAL_IMAGES=$(wc -l < _data/image_list.txt)
+          echo "TOTAL_IMAGES=${TOTAL_IMAGES}" >> $GITHUB_OUTPUT
+
+          if [ "$TOTAL_IMAGES" -eq 0 ]; then
+            echo "::error::No images found in the 'frames' directory matching 'seq-*.png'."
+            exit 1
+          fi
+
+          CURRENT_INDEX=0 # Default to first image if counter file doesn't exist
+          if [ -f _data/image_counter.txt ]; then
+            # Read and validate counter
+            RAW_COUNTER=$(cat _data/image_counter.txt)
+            if [[ "$RAW_COUNTER" =~ ^[0-9]+$ ]] && [ "$RAW_COUNTER" -lt "$TOTAL_IMAGES" ]; then
+              CURRENT_INDEX=$RAW_COUNTER
+            else
+              echo "::warning::Invalid or out-of-bounds counter found ('$RAW_COUNTER'). Resetting to 0."
+              CURRENT_INDEX=0
+            fi
+          fi
+          echo "CURRENT_INDEX=${CURRENT_INDEX}" >> $GITHUB_OUTPUT
+
+      - name: Calculate next image
+        id: next_image
+        run: |
+          current_idx=${{ steps.read_state.outputs.CURRENT_INDEX }}
+          total_images=${{ steps.read_state.outputs.TOTAL_IMAGES }}
+
+          # The image to display now is at current_idx
+          # sed is 1-indexed, so add 1 to 0-based current_idx
+          ACTUAL_LINE_NUMBER_FOR_SED=$(( current_idx + 1 ))
+          # Get only the basename of the file (e.g., seq-0001.png)
+          CURRENT_IMAGE_FILENAME=$(sed -n "${ACTUAL_LINE_NUMBER_FOR_SED}p" _data/image_list.txt | xargs basename)
+
+          # Calculate the index for the *next* iteration's storage
+          next_storage_idx=$(( (current_idx + 1) % total_images )) # Wraps around
+
+          echo "CURRENT_IMAGE_FILENAME=${CURRENT_IMAGE_FILENAME}" >> $GITHUB_OUTPUT
+          echo "NEXT_STORAGE_INDEX=${next_storage_idx}" >> $GITHUB_OUTPUT
+
+      - name: Update current.png
+        run: |
+          # Construct path to the source image in the 'frames' directory
+          CURRENT_IMAGE_PATH="frames/${{ steps.next_image.outputs.CURRENT_IMAGE_FILENAME }}"
+          TARGET_PATH="public/current.png" # To be served by GitHub Pages
+          echo "Copying ${CURRENT_IMAGE_PATH} to ${TARGET_PATH}"
+          mkdir -p public # Ensure public directory exists
+          cp "${CURRENT_IMAGE_PATH}" "${TARGET_PATH}"
+
+      - name: Update counter file for next run
+        run: |
+          echo "${{ steps.next_image.outputs.NEXT_STORAGE_INDEX }}" > _data/image_counter.txt
+
+      - name: Commit changes
+        run: |
+          # Add image_list.txt as it's regenerated each time for accuracy
+          git add public/current.png _data/image_counter.txt _data/image_list.txt
+          
+          if git diff --staged --quiet; then
+            echo "No effective change to image or counter. Skipping commit."
+          else
+            git commit -m "Scheduled image advance: displaying ${{ steps.next_image.outputs.CURRENT_IMAGE_FILENAME }} (index ${{ steps.read_state.outputs.CURRENT_INDEX }})"
+            git push
+          fi
