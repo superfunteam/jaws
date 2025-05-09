@@ -1,0 +1,22 @@
+{
+  "short_name": "1-bit Jaws",
+  "name": "1-bit Jaws",
+  "description": "Celebrate the 50th anniversary of Jaws, one frame at a time.",
+  "icons": [
+    {
+      "src": "https://jaws.superfun.games/touch-icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://jaws.superfun.games/touch-icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "https://jaws.superfun.games/index.html",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#00d6f2"
+} 

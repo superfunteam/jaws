@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1-bit Jaws</title>
+
+    <!-- PWA & Favicon -->
+    <link rel="manifest" href="https://jaws.superfun.games/manifest.json">
+    <link rel="icon" href="https://jaws.superfun.games/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="https://jaws.superfun.games/touch-icon.png">
+    <meta name="theme-color" content="#00d6f2">
+
+    <!-- Unfurl/Open Graph Meta Tags -->
+    <meta property="og:title" content="1-bit Jaws">
+    <meta property="og:description" content="Celebrate the 50th anniversary of Jaws, one frame at a time.">
+    <meta property="og:image" content="https://jaws.superfun.games/unfurl.png"> 
+    <meta property="og:url" content="https://jaws.superfun.games/"> <!-- Assuming this is your site URL -->
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="1-bit Jaws">
+    <meta name="twitter:description" content="Celebrate the 50th anniversary of Jaws, one frame at a time.">
+    <meta name="twitter:image" content="https://jaws.superfun.games/unfurl.png">
+    <meta name="twitter:site" content="@clarklab">
+    <meta name="twitter:creator" content="@clarklab">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -23,9 +45,9 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 bg-[url(theater.png)] bg-cover bg-center flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 bg-[url(theater.png)] bg-cover bg-center flex flex-col items-center justify-start min-h-screen p-4">
 
-    <main class="flex justify-center items-center w-full max-w-2xl">
+    <main class="flex justify-center items-center w-full max-w-2xl mt-12">
         <div class="">
             <img id="sequenceImage" src="https://superfunteam.github.io/jaws/public/current.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md cursor-pointer" onclick="toggleFullscreen(this)">
             <script>
@@ -82,7 +104,9 @@
 
     <footer class="mt-12 text-center text-white opacity-40 text-sm leading-loose">
         <p>Made with ❤ by  <a href="https://twitter.com/clarklab">@clarklab</a> from <a href="https://superfun.games">Superfun Games</a>.<br>Make your own! <a href="https://github.com/superfunteam/jaws">Source on Github here.</a></p>
-        
+        <p class="mt-4">Hacker? Want just the image URLs? The current image can be found at<br><a href="https://superfunteam.github.io/jaws/public/current.png">https://superfunteam.github.io/jaws/public/current.png</a></p>
+        <p class="mt-4">Or access each frame in the sequence, from 0001 to 5301, at<br><a href="https://superfunteam.github.io/jaws/frames/seq-4021.png">https://superfunteam.github.io/jaws/frames/seq-4021.png</a> </p>
+        <p class="mt-4 mb-12"><strong>Is the screen black?</strong> Jaws is dark movie, some screens are black. Check back later.</p>
     </footer>
 
 </body>
