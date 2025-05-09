@@ -1,0 +1,5 @@
+# netlify.toml
+
+[functions."trigger-github-action"]
+  # Cron schedule for every 15 minutes
+  schedule = "*/15 * * * *" 
