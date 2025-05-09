@@ -23,21 +23,16 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 flex flex-col items-center justify-center min-h-screen p-4">
-
-    <header class="mb-8 text-center">
-        <img src="logo-black.png" class="size-24 inline-block mb-6" alt="">
-        <p class="text-white opacity-40">1-bit frame of Jaws, every 15 minutes, until July 4th</p>
-    </header>
+<body class="bg-gray-900 bg-[url(theater.png)] bg-cover bg-center flex flex-col items-center justify-center min-h-screen p-4">
 
     <main class="flex justify-center items-center w-full max-w-2xl">
         <div class="">
-            <img id="sequenceImage" src="public/current.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md">
+            <img id="sequenceImage" src="https://superfunteam.github.io/jaws/public/current.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md cursor-pointer" onclick="toggleFullscreen(this)">
             <script>
                 const img = document.getElementById('sequenceImage');
                 // Add cache-busting timestamp to the image URL
                 const timestamp = new Date().getTime();
-                img.src = `public/current.png?t=${timestamp}`;
+                img.src = `https://superfunteam.github.io/jaws/public/current.png?t=${timestamp}`;
                 
                 img.onerror = function() {
                     // Fallback if the image fails to load
@@ -45,12 +40,48 @@
                     // Adjust placeholder path if needed, or use an absolute URL
                     img.src = `https://superfunteam.github.io/jaws/public/current.png?t=${timestamp}`;
                 };
+
+                // Fullscreen toggle function
+                function toggleFullscreen(element) {
+                    if (!document.fullscreenElement) {
+                        // Enter fullscreen
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.webkitRequestFullscreen) { // Safari
+                            element.webkitRequestFullscreen();
+                        } else if (element.msRequestFullscreen) { // IE11
+                            element.msRequestFullscreen();
+                        }
+                    } else {
+                        // Exit fullscreen
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) { // Safari
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) { // IE11
+                            document.msExitFullscreen();
+                        }
+                    }
+                }
+            </script>
+            <script>
+                // Refresh the page every 15 minutes
+                setTimeout(() => {
+                    window.location.reload();
+                }, 15 * 60 * 1000); // 15 minutes in milliseconds
             </script>
         </div>
+
+        
     </main>
 
-    <footer class="mt-12 text-center text-white opacity-40 text-sm">
-        <p>Made with ❤ by  <a href="https://twitter.com/clarklab">@clarklab</a> from <a href="https://superfun.games">Superfun Games</a>. Make your own! <a href="https://github.com/superfunteam/jaws">Source on Github here.</a></p>
+    <header class="mb-8 text-center">
+        <img src="logo-tile.png" class=" rounded size-16 inline-block mb-6" alt="">
+        <p class="text-white opacity-40">1-bit frame of Jaws, every 15 minutes, until July 4th</p>
+    </header>
+
+    <footer class="mt-12 text-center text-white opacity-40 text-sm leading-loose">
+        <p>Made with ❤ by  <a href="https://twitter.com/clarklab">@clarklab</a> from <a href="https://superfun.games">Superfun Games</a>.<br>Make your own! <a href="https://github.com/superfunteam/jaws">Source on Github here.</a></p>
         
     </footer>
 
