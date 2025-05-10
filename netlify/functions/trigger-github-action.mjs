@@ -99,7 +99,7 @@ async function pingWebhook(githubSuccess, githubMessage, frameDetails) {
   if (!PING_URL) return;
 
   const timestamp = new Date().toISOString();
-  const payload = {
+  const detailsToMerge = {
     triggerEvent: "Netlify Function Execution",
     workflowTargeted: WORKFLOW_FILENAME,
     branchTargeted: GIT_BRANCH,
@@ -112,8 +112,12 @@ async function pingWebhook(githubSuccess, githubMessage, frameDetails) {
     netlifyFunctionTimestamp: timestamp
   };
 
+  const payload = {
+    merge_variables: detailsToMerge
+  };
+
   try {
-    console.log(`Pinging webhook URL: ${PING_URL} with POST data (including frame details)`);
+    console.log(`Pinging webhook URL: ${PING_URL} with POST data (including frame details and merge_variables)`);
     const pingResponse = await fetch(PING_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
