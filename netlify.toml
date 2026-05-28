@@ -1,5 +1,23 @@
 # netlify.toml
 
-[functions."trigger-github-action"]
-  # Cron schedule for every 15 minutes
-  schedule = "*/15 * * * *" 
+# The current frame is now derived from the clock (see frame.js / _frame.mjs),
+# so nothing is committed every 15 minutes and Netlify no longer redeploys the
+# site to advance the image. The scheduled function below only pushes the
+# current frame to TRMNL; it does not trigger any build.
+
+# Keep the legacy "current image" URL working and always correct, without
+# committing a new current.png every 15 minutes.
+[[redirects]]
+  from = "/current.png"
+  to = "/.netlify/functions/current-frame"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/public/current.png"
+  to = "/.netlify/functions/current-frame"
+  status = 302
+  force = true
+
+# The schedule for the TRMNL ping is declared in-code via `export const config`
+# in netlify/functions/ping-trmnl.mjs.
