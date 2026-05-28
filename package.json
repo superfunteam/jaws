@@ -1,14 +1,11 @@
 {
   "name": "jaws-netlify-trigger",
-  "version": "1.0.0",
-  "description": "Netlify function to trigger GitHub Action",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "Time-based frame selection for 1-bit Jaws (no per-deploy cost).",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "node-fetch": "^2.7.0"
-  }
+  "license": "ISC"
 }

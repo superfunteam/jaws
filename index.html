@@ -49,18 +49,30 @@
 
     <main class="flex justify-center items-center w-full max-w-2xl mt-12">
         <div class="">
-            <img id="sequenceImage" width="800" height="480" src="https://superfunteam.github.io/jaws/public/current.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md cursor-pointer" onclick="toggleFullscreen(this)">
+            <img id="sequenceImage" width="800" height="480" src="frames/seq-1900.png" alt="Current Sequenced Image" class="rounded-md max-w-full h-auto shadow-md cursor-pointer" onclick="toggleFullscreen(this)">
+            <script src="frame.js"></script>
             <script>
                 const img = document.getElementById('sequenceImage');
-                // Add cache-busting timestamp to the image URL
-                const timestamp = new Date().getTime();
-                img.src = `https://superfunteam.github.io/jaws/public/current.png?t=${timestamp}`;
-                
+
+                // The frame is derived from the clock, so the site never needs
+                // a redeploy to show the right image. Point at the current frame
+                // and swap to the next one exactly when it changes.
+                function showCurrentFrame() {
+                    img.src = JawsFrame.frameUrl();
+                }
+                function scheduleNextFrame() {
+                    // Re-render right after the next 15-minute boundary.
+                    setTimeout(() => {
+                        showCurrentFrame();
+                        scheduleNextFrame();
+                    }, JawsFrame.msUntilNextFrame() + 1000);
+                }
+                showCurrentFrame();
+                scheduleNextFrame();
+
                 img.onerror = function() {
                     // Fallback if the image fails to load
                     img.alt = "Image currently unavailable. Please check back soon.";
-                    // Adjust placeholder path if needed, or use an absolute URL
-                    img.src = `https://superfunteam.github.io/jaws/public/current.png?t=${timestamp}`;
                 };
 
                 // Fullscreen toggle function
@@ -87,10 +99,12 @@
                 }
             </script>
             <script>
-                // Refresh the page every 15 minutes
+                // Frames now swap in place at each 15-minute boundary, so a
+                // frequent reload is no longer needed. Reload hourly only to
+                // pick up any site updates.
                 setTimeout(() => {
                     window.location.reload();
-                }, 10 * 60 * 1000); // 10 minutes in milliseconds
+                }, 60 * 60 * 1000); // 1 hour in milliseconds
             </script>
         </div>
 
@@ -104,7 +118,7 @@
 
     <footer class="mt-12 text-center text-white opacity-40 text-sm leading-loose px-4">
         <p>Made with ❤ by  <a href="https://twitter.com/clarklab">@clarklab</a> from <a href="https://superfun.games">Superfun Games</a>.<br>Make your own! <a href="https://github.com/superfunteam/jaws">Source on Github here.</a></p>
-        <p class="mt-4">Hacker? Want just the image URLs? The current image can be found at<br><a href="https://superfunteam.github.io/jaws/public/current.png">https://superfunteam.github.io/jaws/public/current.png</a></p>
+        <p class="mt-4">Hacker? Want just the image URLs? The current image can be found at<br><a href="https://jaws.superfun.games/current.png">https://jaws.superfun.games/current.png</a></p>
         <p class="mt-4">Or access each frame in the sequence, from 0001 to 5301, at<br><a href="https://superfunteam.github.io/jaws/frames/seq-4021.png">https://superfunteam.github.io/jaws/frames/seq-4021.png</a> </p>
         <p class="mt-4"><strong>Is the screen black?</strong> Jaws is dark movie, some screens are black (especially early in the movie). Check back later.</p>
         <p class="mt-4 mb-12">Coded with <a href="https://www.cursor.com/">Cursor</a>. Hosted by <a href="https://www.netlify.com/">Netlify</a>.</p>
