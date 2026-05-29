@@ -1,32 +1,51 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { currentIndex, frameFilename, frameUrl, TOTAL_FRAMES } from './netlify/functions/_frame.mjs';
+import {
+  currentIndex, frameFilename, frameUrl, msUntilNextFrame,
+  targetEndMs, TOTAL_FRAMES, INTERVAL_MS
+} from './netlify/functions/_frame.mjs';
 
-const ANCHOR = Date.parse('2026-04-28T03:30:00Z');
-const FIFTEEN_MIN = 15 * 60 * 1000;
+// July 4th, 9:00 PM US Eastern (EDT, UTC-4) == July 5th 01:00 UTC.
+const JULY4_2026 = Date.UTC(2026, 6, 5, 1, 0, 0);
 
-test('anchor maps to the last published frame (seq-1900.png)', () => {
-  assert.equal(currentIndex(ANCHOR), 1899);
-  assert.equal(frameFilename(currentIndex(ANCHOR)), 'seq-1900.png');
+test('the final frame (seq-5301.png) lands exactly on July 4th night', () => {
+  assert.equal(currentIndex(JULY4_2026), TOTAL_FRAMES - 1);
+  assert.equal(frameFilename(currentIndex(JULY4_2026)), 'seq-5301.png');
 });
 
-test('frame holds for 15 minutes, then advances', () => {
-  assert.equal(currentIndex(ANCHOR + 14 * 60 * 1000), 1899);
-  assert.equal(currentIndex(ANCHOR + FIFTEEN_MIN), 1900);
-  assert.equal(currentIndex(ANCHOR - FIFTEEN_MIN), 1898);
+test('it counts forward toward the ending', () => {
+  // 15 min before the end -> second-to-last frame.
+  assert.equal(currentIndex(JULY4_2026 - INTERVAL_MS), TOTAL_FRAMES - 2);
+  // The straight run starts at seq-0001.png, TOTAL_FRAMES-1 steps earlier.
+  assert.equal(currentIndex(JULY4_2026 - (TOTAL_FRAMES - 1) * INTERVAL_MS), 0);
 });
 
-test('sequence wraps around after a full cycle', () => {
-  assert.equal(currentIndex(ANCHOR + TOTAL_FRAMES * FIFTEEN_MIN), 1899);
-  assert.equal(currentIndex(ANCHOR + (TOTAL_FRAMES + 1) * FIFTEEN_MIN), 1900);
+test('the target rolls to the next year right after July 4th night', () => {
+  const justAfter = JULY4_2026 + INTERVAL_MS;
+  assert.equal(targetEndMs(justAfter), Date.UTC(2027, 6, 5, 1, 0, 0));
+});
+
+test('it ends on July 4th every year (recurring), not just 2026', () => {
+  for (const year of [2027, 2028, 2030]) {
+    const end = Date.UTC(year, 6, 5, 1, 0, 0);
+    assert.equal(currentIndex(end), TOTAL_FRAMES - 1, `year ${year}`);
+    assert.equal(currentIndex(end - INTERVAL_MS), TOTAL_FRAMES - 2, `year ${year}`);
+  }
 });
 
 test('index is always within [0, TOTAL_FRAMES)', () => {
-  for (const t of [ANCHOR, ANCHOR - 1e12, ANCHOR + 1e12, Date.now()]) {
+  for (const t of [JULY4_2026, JULY4_2026 - 1e12, JULY4_2026 + 1e12, Date.now()]) {
     const i = currentIndex(t);
     assert.ok(i >= 0 && i < TOTAL_FRAMES, `index ${i} out of range`);
   }
+});
+
+test('msUntilNextFrame is within (0, INTERVAL_MS] and aligns to the boundary', () => {
+  const ms = msUntilNextFrame(JULY4_2026 - 7 * 60 * 1000); // 7 min before end
+  assert.ok(ms > 0 && ms <= INTERVAL_MS);
+  // 7 min before the boundary, the next change is in 7 min.
+  assert.equal(ms, 7 * 60 * 1000);
 });
 
 test('filenames are zero-padded to 4 digits', () => {
@@ -39,8 +58,7 @@ test('frameUrl points at the GitHub Pages frames directory', () => {
 });
 
 test('every frame file referenced by the index actually exists', () => {
-  // Spot-check the boundaries and the anchor frame.
-  for (const i of [0, 1899, TOTAL_FRAMES - 1]) {
+  for (const i of [0, 2650, TOTAL_FRAMES - 1]) {
     assert.ok(existsSync(new URL(`./frames/${frameFilename(i)}`, import.meta.url)),
       `missing frames/${frameFilename(i)}`);
   }

@@ -18,10 +18,24 @@ deploy (~96 paid deploys/day). That's gone.
   - `frame.js` — browser version, used by `index.html` and `screen.html`.
   - `netlify/functions/_frame.mjs` — Node version, used by the functions.
 
-  `index = (ANCHOR_INDEX + floor((now - ANCHOR) / 15min)) mod 5301`
+  The sequence is phased as a **countdown to the upcoming July 4th night**:
 
-  The anchor is set so that the sequence is continuous with the last frame the
-  old system published (`seq-1900.png`).
+  ```
+  index = (5300 - floor((nextJuly4Night - now) / 15min)) mod 5301
+  ```
+
+  So the final frame (`seq-5301.png`) always lands on **July 4th night** (9:00 PM
+  US Eastern by default — see `END_HOUR_ET`). The ~55-day straight run before it
+  plays cleanly from `seq-0001.png` to `seq-5301.png` (5,301 × 15 min ≈ 55 days,
+  starting ~May 10th). The target automatically rolls to the next year after
+  July 4th passes, so it **ends on July 4th every year with no code change**, and
+  the sequence loops in between.
+
+  > One consequence of pinning a fixed calendar date to a ~55-day loop: just
+  > after July 4th night the countdown re-targets next year and the frame jumps
+  > once (mid-sequence) before continuing to loop forward toward the next July
+  > 4th. This single yearly re-sync is unavoidable unless the loop length divides
+  > a year evenly.
 
 - **Website**: `index.html` / `screen.html` compute the frame client-side, show
   it, and swap to the next one exactly at each 15-minute boundary. No backend.
@@ -37,7 +51,8 @@ deploy (~96 paid deploys/day). That's gone.
 
 - **Cadence**: change `INTERVAL_MS` in both `frame.js` and `_frame.mjs` (and the
   cron in `ping-trmnl.mjs`'s `config.schedule`).
-- **Re-anchor the sequence**: set `ANCHOR_MS` / `ANCHOR_INDEX` in both files.
+- **Ending time**: change `END_HOUR_ET` (and `ET_UTC_OFFSET` if not US Eastern)
+  in both files to move when the final frame shows on July 4th night.
 - **Tests**: `npm test` (runs `node --test`) verifies the frame math and that
   the referenced frame files exist.
 
