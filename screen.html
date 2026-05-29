@@ -40,19 +40,24 @@
             text-decoration: underline;
         }
     </style>
+    <!-- Time-based frame logic. Loaded in <head> so the correct frame can be
+         set before first paint (prevents any wrong frame from flashing). -->
+    <script src="frame.js"></script>
 </head>
 <body style="background:black;">
 
     <main style="width:100%;">
         <div style="width:100%;">
-            <img id="sequenceImage" src="frames/seq-1900.png" alt="Current Sequenced Image" style="width:800px; height:auto;" onclick="toggleFullscreen(this)">
-            <script src="frame.js"></script>
+            <!-- No src here on purpose: the correct frame is set by the inline
+                 script below before the browser paints, so a placeholder/other
+                 frame never flashes. -->
+            <img id="sequenceImage" alt="Current Sequenced Image" style="width:800px; height:auto;" onclick="toggleFullscreen(this)">
             <script>
                 const img = document.getElementById('sequenceImage');
 
                 // The frame is derived from the clock, so the screen never needs
-                // a redeploy to show the right image. Point at the current frame
-                // and swap to the next one exactly when it changes.
+                // a redeploy to show the right image. Set the correct frame now
+                // (before paint) and swap to the next one exactly when it changes.
                 function showCurrentFrame() {
                     img.src = JawsFrame.frameUrl();
                 }
